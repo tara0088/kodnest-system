@@ -1,0 +1,197 @@
+<!-- ==========================================
+     KodNest Premium Build System - Component Examples
+     ========================================== -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KodNest Premium Build System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="kn-layout">
+        <!-- TOP BAR -->
+        <header class="kn-top-bar">
+            <div class="kn-project-name">KodNest Build System</div>
+            <div class="kn-progress">Step 3 / 5</div>
+            <div class="kn-badge kn-badge-in-progress">In Progress</div>
+        </header>
+
+        <!-- CONTEXT HEADER -->
+        <section class="kn-context-header">
+            <h1>Configure Database Connection</h1>
+            <p>Set up your database credentials and connection parameters</p>
+        </section>
+
+        <!-- MAIN CONTENT -->
+        <main class="kn-main-content">
+            <!-- PRIMARY WORKSPACE (70%) -->
+            <div class="kn-primary-workspace">
+                <div class="kn-card">
+                    <div class="kn-card-header">
+                        <h3 class="kn-card-title">Database Configuration</h3>
+                    </div>
+                    
+                    <div class="kn-form-group kn-mb-3">
+                        <label class="kn-input-label">Database Type</label>
+                        <select class="kn-input">
+                            <option>PostgreSQL</option>
+                            <option>MySQL</option>
+                            <option>MongoDB</option>
+                            <option>Redis</option>
+                        </select>
+                    </div>
+                    
+                    <div class="kn-form-group kn-mb-3">
+                        <label class="kn-input-label">Host</label>
+                        <input type="text" class="kn-input" placeholder="localhost">
+                    </div>
+                    
+                    <div class="kn-form-group kn-mb-3">
+                        <label class="kn-input-label">Port</label>
+                        <input type="number" class="kn-input" placeholder="5432">
+                    </div>
+                    
+                    <div class="kn-form-group kn-mb-3">
+                        <label class="kn-input-label">Database Name</label>
+                        <input type="text" class="kn-input" placeholder="myapp_production">
+                    </div>
+                    
+                    <div class="kn-form-group kn-mb-4">
+                        <label class="kn-input-label">Connection Pool Size</label>
+                        <input type="range" class="kn-input" min="1" max="100" value="20">
+                        <div class="kn-text-right kn-mt-1">20 connections</div>
+                    </div>
+                    
+                    <div class="kn-flex kn-gap-2">
+                        <button class="kn-button kn-button-secondary">Previous</button>
+                        <button class="kn-button kn-button-primary">Test Connection</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECONDARY PANEL (30%) -->
+            <aside class="kn-secondary-panel">
+                <div class="kn-card kn-mb-4">
+                    <h4 class="kn-card-title kn-mb-2">Step Explanation</h4>
+                    <p>Configure your database connection settings. These credentials will be used to establish secure connections to your database cluster.</p>
+                </div>
+                
+                <div class="kn-card kn-mb-4">
+                    <h4 class="kn-card-title kn-mb-2">Quick Prompt</h4>
+                    <textarea class="kn-input kn-textarea kn-mb-2" readonly>Configure PostgreSQL database connection with host: localhost, port: 5432, database: myapp_production</textarea>
+                    <button class="kn-button kn-button-secondary kn-button-sm kn-mb-1">Copy</button>
+                    <button class="kn-button kn-button-secondary kn-button-sm">Build in Lovable</button>
+                </div>
+                
+                <div class="kn-card">
+                    <h4 class="kn-card-title kn-mb-2">Feedback</h4>
+                    <button class="kn-button kn-button-secondary kn-button-sm kn-mb-1">It Worked</button>
+                    <button class="kn-button kn-button-secondary kn-button-sm kn-mb-1">Error</button>
+                    <button class="kn-button kn-button-secondary kn-button-sm">Add Screenshot</button>
+                </div>
+            </aside>
+        </main>
+
+        <!-- PROOF FOOTER -->
+        <footer class="kn-proof-footer">
+            <div class="kn-proof-checklist">
+                <div class="kn-proof-item">
+                    <input type="checkbox" class="kn-proof-checkbox" id="proof-ui">
+                    <label for="proof-ui" class="kn-proof-label">
+                        UI Built
+                        <input type="text" class="kn-input kn-proof-input kn-mt-1" placeholder="Describe the UI component...">
+                    </label>
+                </div>
+                <div class="kn-proof-item">
+                    <input type="checkbox" class="kn-proof-checkbox" id="proof-logic">
+                    <label for="proof-logic" class="kn-proof-label">
+                        Logic Working
+                        <input type="text" class="kn-input kn-proof-input kn-mt-1" placeholder="Describe the working logic...">
+                    </label>
+                </div>
+                <div class="kn-proof-item">
+                    <input type="checkbox" class="kn-proof-checkbox" id="proof-test">
+                    <label for="proof-test" class="kn-proof-label">
+                        Test Passed
+                        <input type="text" class="kn-input kn-proof-input kn-mt-1" placeholder="Describe the test results...">
+                    </label>
+                </div>
+                <div class="kn-proof-item">
+                    <input type="checkbox" class="kn-proof-checkbox" id="proof-deploy">
+                    <label for="proof-deploy" class="kn-proof-label">
+                        Deployed
+                        <input type="text" class="kn-input kn-proof-input kn-mt-1" placeholder="Describe the deployment...">
+                    </label>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Additional Examples -->
+    <div style="padding: 40px; background: #F7F6F3; margin-top: 40px;">
+        <h2 class="kn-mb-4">Component Showcase</h2>
+        
+        <div class="kn-mb-5">
+            <h3 class="kn-mb-3">Buttons</h3>
+            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                <button class="kn-button kn-button-primary">Primary</button>
+                <button class="kn-button kn-button-secondary">Secondary</button>
+                <button class="kn-button kn-button-primary kn-button-sm">Small</button>
+                <button class="kn-button kn-button-primary kn-button-lg">Large</button>
+            </div>
+        </div>
+        
+        <div class="kn-mb-5">
+            <h3 class="kn-mb-3">Status Badges</h3>
+            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                <span class="kn-badge kn-badge-not-started">Not Started</span>
+                <span class="kn-badge kn-badge-in-progress">In Progress</span>
+                <span class="kn-badge kn-badge-shipped">Shipped</span>
+            </div>
+        </div>
+        
+        <div class="kn-mb-5">
+            <h3 class="kn-mb-3">Cards</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+                <div class="kn-card">
+                    <div class="kn-card-header">
+                        <h4 class="kn-card-title">Configuration Card</h4>
+                    </div>
+                    <p>This is a standard card component with header and content sections.</p>
+                </div>
+                <div class="kn-card">
+                    <div class="kn-card-header">
+                        <h4 class="kn-card-title">Another Card</h4>
+                    </div>
+                    <p>Consistent styling across all card components in the system.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div>
+            <h3 class="kn-mb-3">Form Elements</h3>
+            <div style="max-width: 400px;">
+                <div class="kn-form-group kn-mb-3">
+                    <label class="kn-input-label">Text Input</label>
+                    <input type="text" class="kn-input" placeholder="Enter text...">
+                </div>
+                <div class="kn-form-group kn-mb-3">
+                    <label class="kn-input-label">Textarea</label>
+                    <textarea class="kn-input kn-textarea" placeholder="Enter longer text..."></textarea>
+                </div>
+                <div class="kn-form-group kn-mb-3">
+                    <label class="kn-input-label">Select</label>
+                    <select class="kn-input">
+                        <option>Option 1</option>
+                        <option>Option 2</option>
+                        <option>Option 3</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
