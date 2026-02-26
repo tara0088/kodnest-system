@@ -5,7 +5,8 @@ import {
   Code, 
   FileText, 
   BookOpen, 
-  User 
+  User,
+  History
 } from 'lucide-react';
 
 const DashboardLayout = () => {
@@ -14,6 +15,7 @@ const DashboardLayout = () => {
     { icon: Code, label: 'Practice', path: '/dashboard/practice' },
     { icon: FileText, label: 'Assessments', path: '/dashboard/assessments' },
     { icon: BookOpen, label: 'Resources', path: '/dashboard/resources' },
+    { icon: History, label: 'History', path: '/dashboard/history' },
     { icon: User, label: 'Profile', path: '/dashboard/profile' }
   ];
 
