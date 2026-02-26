@@ -1,29 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { SkillAnalyzer } from '../utils/skillAnalyzer';
+import { useNavigate } from 'react-router-dom';
+import { getHistory } from '../utils/skillAnalyzer';
 
-const HistoryPage = ({ onViewAnalysis }) => {
+const HistoryPage = () => {
+  const navigate = useNavigate();
   const [history, setHistory] = useState([]);
-  const [selectedEntry, setSelectedEntry] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    loadHistory();
+    setHistory(getHistory());
   }, []);
 
-  const loadHistory = () => {
-    const historyData = SkillAnalyzer.getHistory();
-    setHistory(historyData);
-  };
+  const filteredHistory = history.filter(item =>
+    item.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    new Date(item.createdAt).toLocaleDateString().includes(searchTerm)
+  );
 
-  const handleViewAnalysis = (entry) => {
-    setSelectedEntry(entry);
-    if (onViewAnalysis) {
-      onViewAnalysis(entry);
-    }
+  const handleViewAnalysis = (id) => {
+    navigate(`/results/${id}`);
   };
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -32,168 +31,112 @@ const HistoryPage = ({ onViewAnalysis }) => {
     });
   };
 
-  if (selectedEntry) {
-    return (
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">Analysis Results</h1>
-          <button 
-            onClick={() => setSelectedEntry(null)}
-            className="btn-primary"
+  const getScoreColor = (score) => {
+    if (score >= 80) return 'text-green-600 bg-green-100';
+    if (score >= 60) return 'text-yellow-600 bg-yellow-100';
+    return 'text-red-600 bg-red-100';
+  };
+
+  return (
+    <div className="max-w-6xl mx-auto">
+      <div className="card mb-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Analysis History</h1>
+            <p className="text-gray-600 mt-2">
+              {history.length} analysis{history.length !== 1 ? 'es' : ''} saved
+            </p>
+          </div>
+          <button
+            onClick={() => navigate('/analysis')}
+            className="btn-primary mt-4 md:mt-0"
           >
-            ← Back to History
+            New Analysis
           </button>
         </div>
-        <div className="card p-6">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              {selectedEntry.company || 'Unknown Company'}
-            </h2>
-            <p className="text-gray-600">
-              {selectedEntry.role || 'Unknown Role'} • {formatDate(selectedEntry.createdAt)}
-            </p>
-            <div className="mt-2">
-              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
-                📊 {selectedEntry.readinessScore}/100 Readiness
-              </span>
+      </div>
+
+      {history.length === 0 ? (
+        <div className="card text-center py-12">
+          <div className="text-gray-400 mb-4">
+            <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <h3 className="text-xl font-medium text-gray-900 mb-2">No analysis history yet</h3>
+          <p className="text-gray-600 mb-6">Start by analyzing a job description to see your preparation insights.</p>
+          <button
+            onClick={() => navigate('/analysis')}
+            className="btn-primary"
+          >
+            Analyze Your First JD
+          </button>
+        </div>
+      ) : (
+        <>
+          {/* Search */}
+          <div className="card mb-6">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search by company, role, or date..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
             </div>
           </div>
-          
-          <div className="border-t pt-6">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">Extracted Skills</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-              {Object.entries(selectedEntry.extractedSkills)
-                .filter(([_, skills]) => skills.length > 0)
-                .map(([category, skills]) => (
-                  <div key={category} className="bg-gray-50 p-3 rounded-lg">
-                    <h4 className="font-medium text-gray-900 mb-2">{category}</h4>
-                    <div className="flex flex-wrap gap-1">
-                      {skills.map((skill, index) => (
-                        <span 
-                          key={index} 
-                          className="bg-white border border-gray-200 px-2 py-1 rounded text-sm"
-                        >
-                          {skill}
+
+          {/* History List */}
+          <div className="space-y-4">
+            {filteredHistory.map((item) => (
+              <div key={item.id} className="card hover:shadow-md transition-shadow duration-200">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center mb-2">
+                      <h3 className="text-xl font-semibold text-gray-900">{item.company}</h3>
+                      <span className="mx-3 text-gray-300">•</span>
+                      <span className="text-gray-600">{item.role}</span>
+                    </div>
+                    <p className="text-gray-500 text-sm mb-3">
+                      Analyzed on {formatDate(item.createdAt)}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {Object.entries(item.extractedSkills).slice(0, 3).map(([category, skills]) => (
+                        <span key={category} className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm">
+                          {category}: {skills.length} skills
                         </span>
                       ))}
                     </div>
                   </div>
-                ))}
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">7-Day Plan Overview</h3>
-                <ul className="space-y-2">
-                  {selectedEntry.plan.slice(0, 3).map((dayPlan, index) => (
-                    <li key={index} className="flex items-center text-gray-700">
-                      <span className="w-2 h-2 bg-primary-500 rounded-full mr-3"></span>
-                      <span><strong>{dayPlan.day}:</strong> {dayPlan.focus}</span>
-                    </li>
-                  ))}
-                </ul>
+                  
+                  <div className="flex items-center mt-4 md:mt-0">
+                    <div className={`px-4 py-2 rounded-full font-semibold mr-4 ${getScoreColor(item.readinessScore)}`}>
+                      {item.readinessScore}/100
+                    </div>
+                    <button
+                      onClick={() => handleViewAnalysis(item.id)}
+                      className="btn-primary py-2 px-4"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                </div>
               </div>
-              
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">Key Questions</h3>
-                <ul className="space-y-2">
-                  {selectedEntry.questions.slice(0, 3).map((q, index) => (
-                    <li key={index} className="text-gray-700">
-                      <span className="text-primary-600 font-medium">{q.category}:</span> {q.question}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            
-            <div className="mt-6 text-center">
-              <button 
-                onClick={() => handleViewAnalysis(selectedEntry)}
-                className="btn-primary px-8 py-3"
-              >
-                View Full Analysis
-              </button>
-            </div>
+            ))}
           </div>
-        </div>
-      </div>
-    );
-  }
 
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Analysis History</h1>
-        <div className="text-gray-600">
-          {history.length} {history.length === 1 ? 'analysis' : 'analyses'} saved
-        </div>
-      </div>
-      
-      {history.length === 0 ? (
-        <div className="card p-12 text-center">
-          <div className="text-6xl mb-4">📊</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">No Analysis History</h2>
-          <p className="text-gray-600 mb-6">Perform your first job analysis to see it here.</p>
-          <button 
-            onClick={() => window.location.href = '/dashboard'}
-            className="btn-primary"
-          >
-            Go to Dashboard
-          </button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-4">
-          {history.map((entry) => (
-            <div 
-              key={entry.id} 
-              className="card p-6 hover:shadow-md transition-shadow duration-200 cursor-pointer"
-              onClick={() => handleViewAnalysis(entry)}
-            >
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    {entry.company || 'Unknown Company'}
-                  </h3>
-                  <p className="text-gray-600 mb-3">
-                    {entry.role || 'Unknown Role'}
-                  </p>
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {Object.entries(entry.extractedSkills)
-                      .filter(([_, skills]) => skills.length > 0)
-                      .slice(0, 3)
-                      .map(([category, skills]) => (
-                        <span 
-                          key={category} 
-                          className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm"
-                        >
-                          {skills[0]}{skills.length > 1 ? ` +${skills.length - 1}` : ''}
-                        </span>
-                      ))}
-                  </div>
-                  <p className="text-sm text-gray-500">
-                    Analyzed on {formatDate(entry.createdAt)}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <div className="text-3xl font-bold text-primary-600 mb-1">
-                    {entry.readinessScore}
-                  </div>
-                  <div className="text-sm text-gray-500">/100</div>
-                  <div className="mt-2">
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      entry.readinessScore >= 80 ? 'bg-green-100 text-green-800' :
-                      entry.readinessScore >= 60 ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
-                      {entry.readinessScore >= 80 ? 'Excellent' : 
-                       entry.readinessScore >= 60 ? 'Good' : 'Needs Work'}
-                    </span>
-                  </div>
-                </div>
-              </div>
+          {searchTerm && filteredHistory.length === 0 && (
+            <div className="card text-center py-8">
+              <p className="text-gray-600">No matching analyses found.</p>
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
     </div>
   );

@@ -6,6 +6,7 @@ import {
   FileText, 
   BookOpen, 
   User,
+  FileSearch,
   History
 } from 'lucide-react';
 
@@ -14,8 +15,9 @@ const DashboardLayout = () => {
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
     { icon: Code, label: 'Practice', path: '/dashboard/practice' },
     { icon: FileText, label: 'Assessments', path: '/dashboard/assessments' },
+    { icon: FileSearch, label: 'Analyze JD', path: '/analysis' },
+    { icon: History, label: 'History', path: '/history' },
     { icon: BookOpen, label: 'Resources', path: '/dashboard/resources' },
-    { icon: History, label: 'History', path: '/dashboard/history' },
     { icon: User, label: 'Profile', path: '/dashboard/profile' }
   ];
 
