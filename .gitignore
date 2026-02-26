@@ -60,6 +60,7 @@ temp/
 *.tsbuildinfo
 
 # ESLint
+<<<<<<< HEAD
 .eslintcache
 
 # Local env files
@@ -67,3 +68,6 @@ temp/
 .env.development.local
 .env.test.local
 .env.production.local
+=======
+.eslintcache
+>>>>>>> 6836f9a8f98e47289df189e612a24b6710c44d6b
