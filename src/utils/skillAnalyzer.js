@@ -251,6 +251,7 @@ export const saveToHistory = (analysisData) => {
   const newEntry = {
     id: Date.now().toString(),
     createdAt: new Date().toISOString(),
+    skillConfidenceMap: {}, // Initialize confidence map
     ...analysisData
   };
   
@@ -266,4 +267,54 @@ export const getHistory = () => {
 export const getHistoryItem = (id) => {
   const history = getHistory();
   return history.find(item => item.id === id);
+};
+
+export const updateSkillConfidence = (id, skill, confidence) => {
+  const history = getHistory();
+  const itemIndex = history.findIndex(item => item.id === id);
+  
+  if (itemIndex !== -1) {
+    if (!history[itemIndex].skillConfidenceMap) {
+      history[itemIndex].skillConfidenceMap = {};
+    }
+    history[itemIndex].skillConfidenceMap[skill] = confidence;
+    localStorage.setItem('analysisHistory', JSON.stringify(history));
+    return history[itemIndex];
+  }
+  return null;
+};
+
+export const calculateLiveScore = (baseScore, skillConfidenceMap, extractedSkills) => {
+  let score = baseScore;
+  
+  // Get all skills from extracted skills
+  const allSkills = [];
+  Object.values(extractedSkills).forEach(skills => {
+    allSkills.push(...skills);
+  });
+  
+  // Adjust score based on confidence
+  allSkills.forEach(skill => {
+    const confidence = skillConfidenceMap[skill];
+    if (confidence === 'know') {
+      score += 2;
+    } else if (confidence === 'practice') {
+      score -= 2;
+    }
+  });
+  
+  // Bound between 0 and 100
+  return Math.max(0, Math.min(100, Math.round(score)));
+};
+
+export const getWeakSkills = (skillConfidenceMap, extractedSkills) => {
+  const weakSkills = [];
+  Object.entries(extractedSkills).forEach(([category, skills]) => {
+    skills.forEach(skill => {
+      if (skillConfidenceMap[skill] === 'practice') {
+        weakSkills.push({ skill, category });
+      }
+    });
+  });
+  return weakSkills.slice(0, 3); // Return top 3
 };
