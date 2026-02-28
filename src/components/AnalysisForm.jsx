@@ -7,6 +7,7 @@ import {
   generateQuestions, 
   saveToHistory 
 } from '../utils/skillAnalyzer';
+import { validateJdInput, createDefaultAnalysisEntry } from '../utils/dataValidation';
 
 const AnalysisForm = () => {
   const [company, setCompany] = useState('');
@@ -14,11 +15,19 @@ const AnalysisForm = () => {
   const [jdText, setJdText] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
+  const [validationError, setValidationError] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!jdText.trim()) return;
     
+    // Validate input
+    const validation = validateJdInput(jdText);
+    if (!validation.isValid) {
+      setValidationError(validation.errors[0]);
+      return;
+    }
+    
+    setValidationError('');
     setIsAnalyzing(true);
     
     // Simulate processing time for better UX
@@ -28,34 +37,31 @@ const AnalysisForm = () => {
         const extractedSkills = extractSkills(jdText);
         
         // Calculate readiness score
-        const readinessScore = calculateReadinessScore(extractedSkills, company, role, jdText);
+        const baseScore = calculateReadinessScore(extractedSkills, company, role, jdText);
         
         // Generate outputs
         const checklist = generateChecklist(extractedSkills);
         const plan = generatePlan(extractedSkills);
         const questions = generateQuestions(extractedSkills);
         
-        // Prepare analysis data
-        const analysisData = {
+        // Prepare analysis data with standardized schema
+        const analysisData = createDefaultAnalysisEntry({
           company,
           role,
           jdText,
           extractedSkills,
-          checklist,
-          plan,
+          checklist: Object.entries(checklist).map(([roundTitle, items]) => ({ roundTitle, items })),
+          plan7Days: Object.entries(plan).map(([day, tasks]) => ({ day, tasks })),
           questions,
-          readinessScore
-        };
+          baseScore,
+          finalScore: baseScore
+        });
         
         // Save to history
         const savedEntry = saveToHistory(analysisData);
         
         // Set result
-        setAnalysisResult({
-          ...analysisData,
-          id: savedEntry.id,
-          createdAt: savedEntry.createdAt
-        });
+        setAnalysisResult(savedEntry);
         
       } catch (error) {
         console.error('Analysis failed:', error);
@@ -171,19 +177,31 @@ const AnalysisForm = () => {
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Job Description
+              Job Description *
             </label>
             <textarea
               value={jdText}
-              onChange={(e) => setJdText(e.target.value)}
+              onChange={(e) => {
+                setJdText(e.target.value);
+                if (validationError) setValidationError('');
+              }}
               rows={12}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                validationError ? 'border-red-300' : 'border-gray-300'
+              }`}
               placeholder="Paste the complete job description here..."
               required
             />
-            <p className="text-sm text-gray-500 mt-2">
-              {jdText.length} characters
-            </p>
+            <div className="flex justify-between items-center mt-2">
+              <p className="text-sm text-gray-500">
+                {jdText.length} characters
+              </p>
+              {validationError && (
+                <p className="text-sm text-amber-600 bg-amber-50 px-2 py-1 rounded">
+                  {validationError}
+                </p>
+              )}
+            </div>
           </div>
           
           <div className="flex justify-between items-center">

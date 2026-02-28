@@ -7,6 +7,7 @@ import {
   getWeakSkills 
 } from '../utils/skillAnalyzer';
 import CompanyIntel from './CompanyIntel';
+import { getHistoryWithValidation, updateHistoryEntry } from '../utils/dataValidation';
 
 const ResultsPage = () => {
   const { id } = useParams();
@@ -18,12 +19,19 @@ const ResultsPage = () => {
 
   useEffect(() => {
     if (id) {
-      const historyItem = getHistoryItem(id);
+      // Use validated history retrieval
+      const historyResult = getHistoryWithValidation();
+      const historyItem = historyResult.validEntries.find(item => item.id === id);
+      
       if (historyItem) {
         setAnalysisData(historyItem);
-        setLiveScore(historyItem.readinessScore);
+        setLiveScore(historyItem.finalScore);
         setSkillConfidenceMap(historyItem.skillConfidenceMap || {});
       } else {
+        // Check if there were corrupted entries
+        if (historyResult.hasCorrupted) {
+          alert('One saved entry couldn\'t be loaded. Create a new analysis.');
+        }
         navigate('/analysis');
       }
     }
@@ -34,16 +42,26 @@ const ResultsPage = () => {
     const updatedMap = { ...skillConfidenceMap, [skill]: newConfidence };
     setSkillConfidenceMap(updatedMap);
     
-    // Update in localStorage
-    const updatedItem = updateSkillConfidence(id, skill, newConfidence);
-    if (updatedItem) {
-      // Calculate new live score
+    // Update in localStorage with proper validation
+    const updatedItem = updateHistoryEntry(id, { 
+      skillConfidenceMap: updatedMap 
+    });
+    
+    if (updatedItem && analysisData) {
+      // Calculate new live score based on baseScore
       const newScore = calculateLiveScore(
-        updatedItem.readinessScore, 
+        analysisData.baseScore, 
         updatedMap, 
-        updatedItem.extractedSkills
+        analysisData.extractedSkills
       );
       setLiveScore(newScore);
+      
+      // Update the analysis data with new score
+      setAnalysisData({
+        ...analysisData,
+        skillConfidenceMap: updatedMap,
+        finalScore: newScore
+      });
     }
   };
 

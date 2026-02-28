@@ -248,11 +248,40 @@ export const generateQuestions = (detectedSkills) => {
 
 export const saveToHistory = (analysisData) => {
   const history = JSON.parse(localStorage.getItem('analysisHistory') || '[]');
+  
+  // Ensure proper skill categories structure
+  const extractedSkills = analysisData.extractedSkills || {};
+  const normalizedSkills = {
+    coreCS: extractedSkills['Core CS'] || extractedSkills.coreCS || [],
+    languages: extractedSkills['Languages'] || extractedSkills.languages || [],
+    web: extractedSkills['Web'] || extractedSkills.web || [],
+    data: extractedSkills['Data'] || extractedSkills.data || [],
+    cloud: extractedSkills['Cloud/DevOps'] || extractedSkills.cloud || [],
+    testing: extractedSkills['Testing'] || extractedSkills.testing || [],
+    other: extractedSkills['General'] || extractedSkills.other || []
+  };
+  
+  // Add default skills if no skills detected
+  const totalSkills = Object.values(normalizedSkills).flat().length;
+  if (totalSkills === 0) {
+    normalizedSkills.other = ["Communication", "Problem solving", "Basic coding", "Projects"];
+  }
+  
   const newEntry = {
     id: Date.now().toString(),
     createdAt: new Date().toISOString(),
-    skillConfidenceMap: {}, // Initialize confidence map
-    ...analysisData
+    company: analysisData.company || "",
+    role: analysisData.role || "",
+    jdText: analysisData.jdText || "",
+    extractedSkills: normalizedSkills,
+    roundMapping: analysisData.roundMapping || [],
+    checklist: analysisData.checklist || [],
+    plan7Days: analysisData.plan7Days || [],
+    questions: analysisData.questions || [],
+    baseScore: analysisData.baseScore || analysisData.readinessScore || 35,
+    skillConfidenceMap: analysisData.skillConfidenceMap || {},
+    finalScore: analysisData.finalScore || analysisData.readinessScore || 35,
+    updatedAt: new Date().toISOString()
   };
   
   history.unshift(newEntry);
