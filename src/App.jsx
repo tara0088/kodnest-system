@@ -10,6 +10,8 @@ import Profile from './components/Profile';
 import AnalysisForm from './components/AnalysisForm';
 import ResultsPage from './components/ResultsPage';
 import HistoryPage from './components/HistoryPage';
+import TestChecklist from './components/TestChecklist';
+import ShipLock from './components/ShipLock';
 
 function App() {
   return (
@@ -27,6 +29,8 @@ function App() {
           <Route path="/analysis" element={<AnalysisForm />} />
           <Route path="/results/:id" element={<ResultsPage />} />
           <Route path="/history" element={<HistoryPage />} />
+          <Route path="/prp/07-test" element={<TestChecklist />} />
+          <Route path="/prp/08-ship" element={<ShipLock />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
